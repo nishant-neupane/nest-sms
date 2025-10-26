@@ -1,6 +1,8 @@
 "use client";
+
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 
 export default function AuthWrapper({ children }) {
   const router = useRouter();
@@ -8,11 +10,7 @@ export default function AuthWrapper({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem("access_token")
-        : null;
-
+    const token = Cookies.get("access_token");
     if (!token && pathname !== "/login" && pathname !== "/signup") {
       router.push("/login");
       return;
@@ -24,7 +22,7 @@ export default function AuthWrapper({ children }) {
     }
 
     setLoading(false);
-  }, [pathname]);
+  }, [pathname, router]);
 
   if (loading) return <div>Loading...</div>;
 

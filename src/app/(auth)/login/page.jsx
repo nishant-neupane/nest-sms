@@ -25,17 +25,24 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       const res = await fetch("http://192.168.112.19:3000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+
       const data = await res.json();
+
       if (res.ok) {
         toast.success("Login successful!");
-        localStorage.setItem("access_token", data.access || data.token);
-        localStorage.setItem("refresh_token", data.refresh || "");
+
+        if (data.access)
+          Cookies.set("access_token", data.access, { expires: 7 });
+        if (data.refresh)
+          Cookies.set("refresh_token", data.refresh, { expires: 7 });
+
         setTimeout(() => router.push("/dashboard"), 1500);
       } else {
         toast.error(data.message || "Invalid credentials. Try again.");
