@@ -9,22 +9,22 @@ export default function AuthWrapper({ children }) {
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const token = Cookies.get("access_token");
-    if (!token && pathname !== "/login" && pathname !== "/signup") {
-      router.push("/login");
-      return;
-    }
+  // useEffect(() => {
+  //   const token = Cookies.get("access_token");
+  //   if (!token && pathname !== "/login" && pathname !== "/signup") {
+  //     router.push("/login");
+  //     return;
+  //   }
 
-    if (token && (pathname === "/login" || pathname === "/signup")) {
-      router.push("/dashboard");
-      return;
-    }
+  //   if (token && (pathname === "/login" || pathname === "/signup")) {
+  //     router.push("/dashboard");
+  //     return;
+  //   }
 
-    setLoading(false);
-  }, [pathname, router]);
+  //   setLoading(false);
+  // }, [pathname, router]);
 
-  if (loading) return <div>Loading...</div>;
+  // if (loading) return <div>Loading...</div>;
 
   return children;
 }
