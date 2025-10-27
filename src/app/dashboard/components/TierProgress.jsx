@@ -9,7 +9,7 @@ export const TierProgress = () => {
       <h2 className="font-semibold text-gray-800 mb-3">
         Current Tier: <span className="text-gray-700">Silver</span>
       </h2>
-      <div className="relative flex items-center justify-center max-h-[120px] overflow-hidden">
+      <div className="relative flex items-center justify-center max-h-[120px] 2xl:max-h-[160px] overflow-hidden">
         <svg
           className="w-80 h-80 rotate-360"
           viewBox="0 0 120 60"
