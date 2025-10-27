@@ -10,7 +10,7 @@ import { WeeklyAnalysisChart } from "./WeeklyAnalysisChart";
 const Body = () => {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-      <div className="xl:col-span-2 2xl:col-span-3 space-y-6">
+      <div className="xl:col-span-2 2xl:col-span-3 space-y-2">
         <div className="grid sm:grid-cols-3 gap-2">
           <StatCard
             title="Current Balance"
@@ -39,13 +39,13 @@ const Body = () => {
           <SenderIDCard />
         </div>
 
-        <div className="grid sm:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-3 gap-2">
           <UsersOverview />
           <TierProgress />
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-2">
         <DisclosureCard />
         <PromoCard />
       </div>
