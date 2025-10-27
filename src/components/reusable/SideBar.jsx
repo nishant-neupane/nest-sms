@@ -105,10 +105,10 @@ export default function Sidebar() {
 
   return (
     <div className="ml-6 relative ">
-      <aside className="fixed left-0 top-0 h-screen w-64 bg-[#F6F6F6] border-r shadow-sm z-20">
+      <aside className="fixed left-0 top-0 h-screen w-64 bg-[#F6F6F6] shadow-sm z-20">
         <Link
           href="/dashboard"
-          className="flex items-center justify-center h-16 font-semibold text-lg border-b"
+          className="flex items-center justify-center h-16 font-semibold text-lg"
         >
           <Image
             src="/images/home/nest-sms.png"
