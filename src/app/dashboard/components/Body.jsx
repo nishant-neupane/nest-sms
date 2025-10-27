@@ -7,7 +7,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import React from "react";
-import { ArrowUpRight, ChevronUp } from "lucide-react";
+import { ArrowUpRight, ChevronUp, UserRound } from "lucide-react";
+import Image from "next/image";
 
 const Body = () => {
   const percentage = 41;
@@ -258,33 +259,90 @@ const Body = () => {
       </div>
 
       <div className="space-y-6">
-        <div className="bg-white p-5 rounded-xl shadow-sm ">
-          <h2 className="font-semibold text-gray-800 mb-3">Disclosure</h2>
-          <p className="text-sm mb-2">
-            Current rate: <b>Rs. 0.9</b> per SMS
-          </p>
-          <div className="mt-4">
-            <p className="text-sm text-gray-600 mb-1">KYC Registered Under</p>
-            <p className="font-medium">Jayesh Muthmare</p>
-            <p className="text-sm text-gray-500">
-              Citizenship ID: 09-898090-912312-99
+        <div className="bg-white p-5 rounded-xl shadow-sm">
+          <div className="flex items-center gap-2 mb-5">
+            <div className="text-[#4A99FF]">
+              <UserRound fill="#4A99FF" />
+            </div>
+            <h2 className="font-medium text-2xl leading-[100%] text-black">
+              Disclosure
+            </h2>
+          </div>
+
+          <div className="bg-[#ECF4FF] p-3 rounded-lg mb-6">
+            <p className="font-light text-[15px] leading-[100%] text-[#000000] mb-1">
+              Current rate:
             </p>
-            <p className="text-sm text-gray-500">
-              Account Manager: Gayesh Rawal
+            <span className="font-semibold">Rs. 0.9</span>{" "}
+            <span className="font-light text-[15px] leading-[100%] text-[#000000]">
+              per SMS
+            </span>
+          </div>
+
+          <div>
+            <p className="font-bold text-xl leading-[100%] text-black my-6">
+              KYC Registered Under
             </p>
-            <p className="text-sm text-gray-500">Contact: 9832781920</p>
+
+            <div className="space-y-6">
+              <div>
+                <p className="font-light text-[15px] leading-[100%] text-[#000000]">
+                  Name
+                </p>
+                <p className="font-medium text-base leading-[100%] text-black mt-2">
+                  Jayesh Muthmare
+                </p>
+              </div>
+
+              <div>
+                <p className="font-light text-[15px] leading-[100%] text-[#000000]">
+                  Citizenship / Company Registration ID:
+                </p>
+                <p className="font-medium text-base leading-[100%] text-black mt-2">
+                  09-898090-912312-99
+                </p>
+              </div>
+
+              <div>
+                <p className="font-light text-[15px] leading-[100%] text-[#000000]">
+                  Account Manager:
+                </p>
+                <p className="font-medium text-base leading-[100%] text-black mt-2">
+                  Gayesh Rawal
+                </p>
+              </div>
+
+              <div>
+                <p className="font-light text-[15px] leading-[100%] text-[#000000]">
+                  Account Manager’s Contact:
+                </p>
+                <p className="font-medium text-base leading-[100%] text-black mt-2">
+                  9832781920
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-xl shadow-sm ">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-xl p-5 text-center">
-            <p className="text-lg font-semibold">Promo Code</p>
-            <p className="text-3xl font-bold mt-2">17% OFF</p>
-            <p className="text-sm mt-2">
-              Unlock exclusive savings! Don't miss out on this limited-time
-              offer.
-            </p>
+        <div className="bg-gradient-to-br from-[#1A72E4] to-[#004BAC] text-center text-white rounded-lg p-7 relative overflow-hidden">
+          <div className="absolute -right-4 bottom-0 ">
+            <Image
+              src={"/images/home/buttom.png"}
+              width={95}
+              height={153}
+              alt="buttom"
+            />
           </div>
+          <p className="font-bold text-lg leading-[100%] text-white">
+            Promo Code
+          </p>
+          <p className="font-[900] text-4xl leading-[100%] text-white my-3">
+            17% OFF
+          </p>
+          <p className="font-medium text-xs leading-[130%] text-white max-w-[200px] mx-auto">
+            Unlock exclusive savings with our special promo code! Don’t miss out
+            on this limited-time offer!
+          </p>
         </div>
       </div>
     </div>
