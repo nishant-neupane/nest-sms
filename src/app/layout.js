@@ -1,6 +1,8 @@
+import AuthWrapper from "@/components/auth/AuthWrapper";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import AuthWrapper from "@/components/auth/AuthWrapper";
+import Sidebar from "@/components/reusable/SideBar";
+import Header from "@/components/reusable/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,7 +25,13 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthWrapper>{children}</AuthWrapper>
+        <Sidebar />
+        <div className="flex flex-col flex-1 overflow-hidden">
+          <Header />
+          <div className="ml-64 mt-32">
+            <AuthWrapper>{children}</AuthWrapper>
+          </div>
+        </div>
       </body>
     </html>
   );
