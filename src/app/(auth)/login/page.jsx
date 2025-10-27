@@ -9,6 +9,8 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Eye, EyeOff } from "lucide-react";
 
+// Use environment variable for API URL
+
 export default function LoginPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -27,27 +29,37 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://192.168.112.19:3000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await res.json();
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+          credentials: "include", // This is correct
+        }
+      );
 
       if (res.ok) {
+        const data = await res.json();
         toast.success("Login successful!");
 
-        if (data.access)
-          Cookies.set("access_token", data.access, { expires: 7 });
-        if (data.refresh)
-          Cookies.set("refresh_token", data.refresh, { expires: 7 });
+        // Debug: Check if cookies are present
+        console.log("Cookies after login:", document.cookie);
 
-        setTimeout(() => router.push("/dashboard"), 1500);
+        // Small delay to show toast, then redirect
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
       } else {
-        toast.error(data.message || "Invalid credentials. Try again.");
+        const data = await res.json();
+        toast.error(
+          data.error || data.message || "Invalid credentials. Try again."
+        );
       }
     } catch (error) {
+      console.error("Login error:", error);
       toast.error("Network error. Please try again later.");
     } finally {
       setLoading(false);
