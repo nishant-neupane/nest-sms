@@ -30,7 +30,7 @@ export const DisclosureCard = () => (
       <p className="font-bold text-xl leading-[100%] text-black my-6">
         KYC Registered Under
       </p>
-      <div className="space-y-3.5">
+      <div className="space-y-3.5 2xl:space-y-5">
         <div>
           <p className="font-light text-[15px] leading-[100%] text-[#000000]">
             Name
