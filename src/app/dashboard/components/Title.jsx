@@ -2,12 +2,12 @@ import React from "react";
 
 const Title = () => {
   return (
-    <div className="flex justify-between items-center p-6">
+    <div className="flex justify-between items-center">
       <div>
         <p className="font-medium text-[40px] text-black leading-7">
           Dashboard
         </p>
-        <p className="text-base text-black/40 mt-2">
+        <p className="text-lg text-black/50 my-3">
           Plan, prioritize, and accomplish your tasks with ease.
         </p>
       </div>
