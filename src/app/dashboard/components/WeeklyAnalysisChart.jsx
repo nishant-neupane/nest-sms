@@ -47,13 +47,13 @@ export const WeeklyAnalysisChart = () => (
               dataKey="ntc"
               stackId="a"
               fill="#045CCF"
-              radius={[0, 0, 0, 0]}
+              radius={[ 0, 0, 0, 0]}
             />
             <Bar
               dataKey="ncell"
               stackId="a"
               fill="#8CBEFF"
-              radius={[50, 50, 0, 0]}
+              radius={[0, 0, 0, 0]}
             />
           </BarChart>
         </ResponsiveContainer>

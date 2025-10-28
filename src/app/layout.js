@@ -27,7 +27,7 @@ export default function RootLayout({ children }) {
       >
         <Sidebar />
         <div className="flex flex-col flex-1 overflow-hidden">
-          <div className="ml-64 p-6 h-[calc(100vh-64px)] overflow-y-auto">
+          <div className="ml-64 px-6 pt-6 h-[calc(100vh-64px)] overflow-y-auto">
           <Header />
             <AuthWrapper>{children}</AuthWrapper>
           </div>

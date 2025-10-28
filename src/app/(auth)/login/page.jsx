@@ -29,26 +29,19 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-          credentials: "include", // This is correct
-        }
-      );
+      const res = await fetch(`/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+        credentials: "include",
+      });
 
       if (res.ok) {
         const data = await res.json();
         toast.success("Login successful!");
 
-        // Debug: Check if cookies are present
         console.log("Cookies after login:", document.cookie);
 
-        // Small delay to show toast, then redirect
         setTimeout(() => {
           router.push("/dashboard");
         }, 1500);

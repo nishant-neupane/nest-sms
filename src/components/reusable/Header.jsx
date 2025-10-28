@@ -4,8 +4,8 @@ import { Bell } from "lucide-react";
 
 export default function Header() {
   return (
-    <div className="pb-6">
-      <div className="bg-[#f9f9f9] rounded-xl flex items-center justify-between p-6  ">
+    <div className="pb-2">
+      <div className="bg-[#f9f9f9] rounded-xl flex items-center justify-between p-4  ">
         <div>
           <p className="text-sm font-medium text-[#000000]/50 ">Your Plan:</p>
           <h2 className="text-2xl font-bold text-[24px] text-[#3283EC] ">
