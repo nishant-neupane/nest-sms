@@ -1,8 +1,8 @@
-import AuthWrapper from "@/components/auth/AuthWrapper";
+// src/app/layout.js
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/components/reusable/SideBar";
-import Header from "@/components/reusable/Header";
+import AuthWrapper from "@/components/wrapper/AuthWrapper";
+import LayoutWrapper from "@/components/wrapper/LayoutWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,13 +25,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Sidebar />
-        <div className="flex flex-col flex-1 overflow-hidden">
-          <div className="ml-64 px-6 pt-6 h-[calc(100vh-64px)] overflow-y-auto">
-          <Header />
-            <AuthWrapper>{children}</AuthWrapper>
-          </div>
-        </div>
+        <AuthWrapper>
+          <LayoutWrapper>{children}</LayoutWrapper>
+        </AuthWrapper>
       </body>
     </html>
   );
