@@ -105,18 +105,18 @@ export default function Sidebar() {
 
   return (
     <div className="relative">
-      <div className="ml-4 fixed left-0 top-0 h-screen w-64 ">
-        <aside className="bg-[#F6F6F6]">
+      <div className="ml-3 fixed left-0 top-0 h-screen w-[238px]">
+        <aside className="bg-[#F6F6F6] mt-3 rounded-lg">
           <Link
             href="/dashboard"
             className="flex items-center justify-center h-16 font-semibold text-lg "
           >
             <Image
               src="/images/home/nest-sms.png"
-              width={180}
+              width={190}
               height={40}
               alt="nest-sms"
-              className="object-contain "
+              className="object-contain pt-4"
             />
           </Link>
 
