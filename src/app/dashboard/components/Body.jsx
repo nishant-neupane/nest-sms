@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { DisclosureCard } from "./DisclosureCard";
 import { PromoCard } from "./PromoCard";
 import { SenderIDCard } from "./SenderIDCard";
@@ -6,15 +7,31 @@ import { StatCard } from "./StatCard";
 import { TierProgress } from "./TierProgress";
 import { UsersOverview } from "./UsersOverview";
 import { WeeklyAnalysisChart } from "./WeeklyAnalysisChart";
+import { getWalletBalance } from "@/services/api";
 
 const Body = () => {
+  const [wallet, setWallet] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const walletData = await getWalletBalance();
+      if (walletData) setWallet(walletData);
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 2xl:grid-cols-4 gap-2">
       <div className="xl:col-span-2 2xl:col-span-3 space-y-2">
         <div className="grid sm:grid-cols-3 gap-2">
           <StatCard
             title="Current Balance"
-            value="20,000"
+            value={
+              loading
+                ? "xxx.xx"
+                : ` ${wallet.balance}`
+            }
             subtitle="Increase from last month"
             gradient={true}
             icon={true}

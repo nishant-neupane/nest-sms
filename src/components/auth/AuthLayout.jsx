@@ -9,13 +9,13 @@ export default function AuthLayout({ children }) {
       </div>
 
       <div className="bg-[#2375E0] rounded-xl md:col-span-2">
-        <Image
+        {/* <Image
           src={"/images/auth/right-bg.png"}
           height={400}
           width={490}
           alt="Auth Background"
           className="h-full w-full "
-        />
+        /> */}
       </div>
     </div>
   );
