@@ -63,10 +63,9 @@ export default function SendSMS() {
   };
 
   return (
-    <div className="bg-[#F6F6F6] min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-7xl rounded-lg shadow-md grid grid-cols-1 md:grid-cols-5 gap-8 p-8 bg-white">
+    <div className="bg-[#F6F6F6] h-full  flex items-center p-4">
+      <div className="w-full rounded-lg grid grid-cols-1 md:grid-cols-5 gap-8 p-8">
         <div className="space-y-5 md:col-span-3">
-          {/* Sender ID and Phone Number */}
           <div className="flex items-start justify-between gap-6">
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -291,7 +290,7 @@ export default function SendSMS() {
 
                 {/* Messages */}
                 <div className="absolute inset-0 flex flex-col pt-16 gap-4 px-4 overflow-y-auto pb-4">
-                  {message && (
+                  {message ? (
                     <div className="flex gap-3">
                       <div className="w-6 h-6 rounded-full bg-blue-500 flex-shrink-0"></div>
                       <div className="max-w-[70%]">
@@ -306,15 +305,41 @@ export default function SendSMS() {
                         </span>
                       </div>
                     </div>
-                  )}
+                  ) : (
+                    // Skeleton loader when no message
+                    <div className="space-y-4">
+                      {/* Skeleton message bubbles */}
+                      <div className="flex gap-3 animate-pulse">
+                        <div className="w-6 h-6 rounded-full bg-gray-300 flex-shrink-0"></div>
+                        <div className="max-w-[70%]">
+                          <div className=" rounded-2xl rounded-tl-none px-4 py-3">
+                            <div className="h-3 bg-gray-300 rounded w-32 mb-2"></div>
+                            <div className="h-3 bg-gray-300 rounded w-24"></div>
+                          </div>
+                          <div className="h-2 bg-gray-200 rounded w-16 mt-1"></div>
+                        </div>
+                      </div>
 
-                  {!message && (
-                    <div className="flex items-center justify-center h-full">
-                      <p className="text-gray-400 text-sm text-center">
-                        Your message will
-                        <br />
-                        appear here
-                      </p>
+                      <div className="flex gap-3 animate-pulse">
+                        <div className="w-6 h-6 rounded-full bg-gray-300 flex-shrink-0"></div>
+                        <div className="max-w-[70%]">
+                          <div className="rounded-2xl rounded-tl-none px-4 py-3">
+                            <div className="h-3 bg-gray-300 rounded w-28 mb-2"></div>
+                            <div className="h-3 bg-gray-300 rounded w-20"></div>
+                          </div>
+                          <div className="h-2 bg-gray-200 rounded w-16 mt-1"></div>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3 animate-pulse">
+                        <div className="w-6 h-6 rounded-full bg-gray-300 flex-shrink-0"></div>
+                        <div className="max-w-[70%]">
+                          <div className="rounded-2xl rounded-tl-none px-4 py-3">
+                            <div className="h-3 bg-gray-300 rounded w-36"></div>
+                          </div>
+                          <div className="h-2 bg-gray-200 rounded w-16 mt-1"></div>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
