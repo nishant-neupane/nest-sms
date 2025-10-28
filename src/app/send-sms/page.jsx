@@ -11,7 +11,6 @@ export default function SendSMS() {
   const [isNepali, setIsNepali] = useState(false);
   const [showTypingIndicator, setShowTypingIndicator] = useState(false);
 
-  // Simulate typing indicator when message is being typed
   useEffect(() => {
     if (message) {
       setShowTypingIndicator(true);
@@ -169,59 +168,57 @@ export default function SendSMS() {
                 </div>
 
                 <div className="absolute inset-0 flex flex-col pt-16 gap-4 px-4 overflow-y-auto">
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-gray-300 flex-shrink-0"></div>
-                    <div className="max-w-[70%]">
-                      <div className="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-2">
-                        <p className="text-sm text-gray-800">
-                          Hello! How can I help you?
-                        </p>
-                      </div>
-                      <span className="text-xs text-gray-500 mt-1 block">
-                        10:30 AM
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Typing Indicator */}
-                  {showTypingIndicator && (
+                  {/* {showTypingIndicator && (
                     <div className="flex items-start gap-3">
                       <div className="w-6 h-6 rounded-full bg-gray-300 flex-shrink-0"></div>
                       <div className="max-w-[70%]">
                         <div className="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3">
                           <div className="flex gap-1">
                             <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                            <div
-                              className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                          
-                            ></div>
-                            <div
-                              className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                        
-                            ></div>
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0.4s]"></div>
                           </div>
                         </div>
                       </div>
                     </div>
+                  )} */}
+                  <div className="flex gap-3">
+                    <div className="w-6 h-6 rounded-full bg-gray-500 "></div>
+                    <div className="max-w-[70%]">
+                      <div className="bg-gray-500 text-white mt-1 rounded-2xl rounded-tl-none px-16 py-4">
+                        <p className="text-sm text-wrap"></p>
+                      </div>
+                      <span className="text-xs text-gray-500 mt-1 block text-left">
+                      </span>
+                    </div>
+                  </div>
+                  {message && (
+                    <div className="flex gap-3">
+                      <div className="w-6 h-6 rounded-full bg-gray-500 "></div>
+                      <div className="max-w-[70%]">
+                        <div className="bg-gray-500 text-white mt-1 rounded-2xl rounded-tl-none px-4 py-3">
+                          <p className="text-sm text-wrap ">{message}</p>
+                        </div>
+                        <span className="text-xs text-gray-500 mt-1 block text-left">
+                          10:31 AM
+                        </span>
+                      </div>
+                    </div>
                   )}
-
-               
-
-                  {/* Placeholder when no message */}
-                  {!message && (
+                  {!message && !showTypingIndicator && (
                     <>
-                      <div className="self-end flex items-start gap-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-gray-300 flex-shrink-0"></div>
                         <div className="max-w-[70%]">
-                          <div className="bg-blue-500 text-white rounded-2xl rounded-tr-none px-4 py-2">
-                            <p className="text-sm">
-                              Your message will appear here
-                            </p>
+                          <div className="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-2">
+                            {/* <p className="text-sm text-gray-800">
+                              Hello! How can I help you?
+                            </p> */}
                           </div>
-                          <span className="text-xs text-gray-500 mt-1 block text-right">
-                            10:31 AM
+                          <span className="text-xs text-gray-500 mt-1 block">
+                            10:30 AM
                           </span>
                         </div>
-                        <div className="w-6 h-6 rounded-full bg-blue-300 flex-shrink-0"></div>
                       </div>
                     </>
                   )}
