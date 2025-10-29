@@ -109,8 +109,8 @@ export default function Sidebar() {
       title: "General",
       items: [
         { name: "Settings", href: "/settings", icon: Settings },
-        { name: "Logout", href: "/logout", icon: LogOut },
         { name: "Payment", href: "/payment", icon: Wallet },
+        { name: "Logout", href: "/logout", icon: LogOut },
       ],
     },
   ];
