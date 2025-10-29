@@ -15,7 +15,7 @@ export default function AuthWrapper({ children }) {
 
   const checkAuth = async () => {
     try {
-      const res = await fetch("api/auth/me", {
+      const res = await fetch("/api/auth/me", {
         method: "GET",
         credentials: "include",
       });

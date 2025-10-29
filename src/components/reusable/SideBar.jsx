@@ -120,7 +120,7 @@ export default function Sidebar() {
             />
           </Link>
 
-          <nav className="p-4 space-y-6 overflow-y-auto h-[calc(100vh-8rem)]">
+          <nav className="p-4 space-y-6 overflow-y-auto h-[calc(100vh-4rem)]">
             {menu.map((section) => (
               <div key={section.title}>
                 <h2 className="text-[18px] tracking-wide my-6 text-[#949494]">
