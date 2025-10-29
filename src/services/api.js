@@ -21,7 +21,7 @@ export async function getTransactions(limit = 10, offset = 0) {
       credentials: "include",
     });
 
-    if (!res.ok) throw new Error("Failed to fetch transactions");
+    // if (!res.ok) throw new Error("Failed to fetch transactions");
     return await res.json();
   } catch (error) {
     console.error("Transaction Fetch Error:", error);
