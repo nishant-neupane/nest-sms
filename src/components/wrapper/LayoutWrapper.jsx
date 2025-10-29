@@ -18,7 +18,7 @@ export default function LayoutWrapper({ children }) {
     <div className="flex">
       <Sidebar />
       <div className="flex flex-col w-full">
-        <div className="ml-64 pr-4 pt-3  overflow-y-auto">
+        <div className="ml-[280px] pr-4 pt-3  overflow-y-auto">
           <Header />
           {children}
         </div>

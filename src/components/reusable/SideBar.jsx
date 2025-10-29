@@ -22,6 +22,8 @@ import {
   Calendar,
   Key,
   BookOpen,
+  IdCard,
+  Wallet,
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -46,6 +48,8 @@ export default function Sidebar() {
       title: "Menu",
       items: [
         { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+        { name: "Users", href: "/users", icon: Users },
+        { name: "Sender ID", href: "/sender-id", icon: IdCard },
         { name: "Send SMS", href: "/send-sms", icon: MessageSquare },
         {
           name: "Contacts",
@@ -63,7 +67,6 @@ export default function Sidebar() {
           ],
         },
         { name: "SMS Batch", href: "/sms-batch", icon: Users },
-        { name: "SMS Files", href: "/sms-files", icon: FileText },
         {
           name: "SMS Report",
           href: "/sms-report",
@@ -87,8 +90,16 @@ export default function Sidebar() {
           hasDropdown: true,
           dropdownKey: "apiIntegration",
           subItems: [
-            { name: "API Token", href: "/api-integration/api-token", icon: Key },
-            { name: "API Docs", href: "/api-integration/api-docs", icon: BookOpen },
+            {
+              name: "API Token",
+              href: "/api-integration/api-token",
+              icon: Key,
+            },
+            {
+              name: "API Docs",
+              href: "/api-integration/api-docs",
+              icon: BookOpen,
+            },
           ],
         },
         { name: "Transactions", href: "/transactions", icon: CreditCard },
@@ -99,17 +110,18 @@ export default function Sidebar() {
       items: [
         { name: "Settings", href: "/settings", icon: Settings },
         { name: "Logout", href: "/logout", icon: LogOut },
+        { name: "Payment", href: "/payment", icon: Wallet },
       ],
     },
   ];
 
   return (
     <div className="relative">
-      <div className="ml-3 fixed left-0 top-0 h-screen w-[238px]">
+      <div className="ml-3 fixed left-0 top-0 h-screen w-[260px]">
         <aside className="bg-[#F6F6F6] mt-3 rounded-lg">
           <Link
             href="/dashboard"
-            className="flex items-center justify-center h-16 font-semibold text-lg "
+            className="flex items-center justify-center h-16 font-semibold text-lg"
           >
             <Image
               src="/images/home/nest-sms.png"
@@ -155,7 +167,7 @@ export default function Sidebar() {
                                 <Icon
                                   size={28}
                                   strokeWidth={1.8}
-                                  className={` ${
+                                  className={`${
                                     active
                                       ? "stroke-[#287AE4] fill-[#287AE4]"
                                       : "stroke-[#949494] fill-transparent group-hover:stroke-[#287AE4] group-hover:fill-[#287AE4]"
@@ -204,7 +216,7 @@ export default function Sidebar() {
                                 <Icon
                                   size={28}
                                   strokeWidth={1.8}
-                                  className={` ${
+                                  className={`${
                                     active
                                       ? "stroke-[#287AE4] fill-[#287AE4]"
                                       : "stroke-[#949494] fill-transparent group-hover:stroke-[#287AE4] group-hover:fill-[#287AE4]"
@@ -224,6 +236,7 @@ export default function Sidebar() {
                           )}
                         </div>
 
+                        {/* Dropdown */}
                         {item.hasDropdown && isDropdownOpen && (
                           <div className="ml-12 mt-1 space-y-1">
                             {item.subItems.map((subItem) => {
