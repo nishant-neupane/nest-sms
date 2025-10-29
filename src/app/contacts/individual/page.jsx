@@ -3,8 +3,7 @@
 import { CheckCircle, Edit, PlusCircle, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-// Import your API function
-import { contacts as fetchContacts } from "@/services/api"; // adjust path if needed
+import { contacts as fetchContacts } from "@/services/api"; 
 
 export default function ContactList() {
   const [contacts, setContacts] = useState([]);
@@ -16,7 +15,6 @@ export default function ContactList() {
   const [dataNotFound, setDataNotFound] = useState(false);
   const [apiError, setApiError] = useState(null); // New state for API errors
 
-  // Fetch contacts on mount
   useEffect(() => {
     const loadContacts = async () => {
       setLoading(true);
