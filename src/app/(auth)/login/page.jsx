@@ -43,7 +43,7 @@ export default function LoginPage() {
       }
 
       showToast("Login Successful!", "success");
-      // setTimeout(() => router.push("/dashboard"), 1500);
+      setTimeout(() => router.push("/dashboard"));
     } catch (error) {
       console.error(error);
       showToast("Something went wrong", "error");

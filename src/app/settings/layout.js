@@ -1,11 +1,5 @@
-import React from 'react'
+import ProfileWrapper from "./components/ProfileWrapper";
 
-const layout = () => {
-  return (
-    <div>
-      fkdsl
-    </div>
-  )
+export default function SettingsLayout({ children }) {
+  return <ProfileWrapper>{children}</ProfileWrapper>;
 }
-
-export default layout
