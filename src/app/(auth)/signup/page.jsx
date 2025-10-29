@@ -201,7 +201,6 @@ export default function SignupPage() {
           alt="Auth Background"
           width={490}
           height={400}
-          className="h-full w-full object-cover"
         />
       </div>
     </div>

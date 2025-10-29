@@ -13,24 +13,56 @@ export default function ContactList() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [contactsPerPage] = useState(7);
+  const [dataNotFound, setDataNotFound] = useState(false);
+  const [apiError, setApiError] = useState(null); // New state for API errors
 
   // Fetch contacts on mount
   useEffect(() => {
     const loadContacts = async () => {
       setLoading(true);
+      setDataNotFound(false);
+      setApiError(null); // Reset error state
       try {
         const result = await fetchContacts();
         console.log("Fetched contacts data:", result);
 
-        if (result?.data?.contacts) {
+        // More robust data checking
+        if (
+          result &&
+          result.data &&
+          Array.isArray(result.data.contacts) &&
+          result.data.contacts.length > 0
+        ) {
           setContacts(result.data.contacts);
-        } else {
-          console.error("Unexpected data format:", result);
+          setDataNotFound(false);
+        } else if (
+          result &&
+          result.data &&
+          Array.isArray(result.data.contacts) &&
+          result.data.contacts.length === 0
+        ) {
+          // Empty array - valid response but no data
+          console.log("API returned empty contacts array");
           setContacts([]);
+          setDataNotFound(true);
+        } else {
+          // Invalid response format or authentication issue
+          console.warn("Unexpected API response format:", result);
+          setContacts([]);
+          setDataNotFound(true);
+
+          // Check if it's an authentication issue (empty object often indicates auth failure)
+          if (result && Object.keys(result).length === 0) {
+            setApiError("Authentication required. Please log in again.");
+          } else {
+            setApiError("Failed to load contacts. Please try again.");
+          }
         }
       } catch (error) {
         console.error("Error fetching contacts:", error);
         setContacts([]);
+        setDataNotFound(true);
+        setApiError("Network error. Please check your connection.");
       } finally {
         setLoading(false);
       }
@@ -74,11 +106,13 @@ export default function ContactList() {
         date: new Date().toLocaleDateString("en-GB"),
       };
       setContacts([...contacts, newContact]);
+      setDataNotFound(false);
+      setApiError(null); // Clear any previous errors when adding contact
       // Go to last page where the new contact will be shown
       const totalFilteredPages = Math.ceil(
-        filteredContacts.length / contactsPerPage
+        (filteredContacts.length + 1) / contactsPerPage
       );
-      setCurrentPage(totalFilteredPages + 1);
+      setCurrentPage(totalFilteredPages);
     }
   };
 
@@ -117,6 +151,31 @@ export default function ContactList() {
   useEffect(() => {
     setCurrentPage(1);
   }, [search]);
+
+  // Retry loading contacts
+  const handleRetry = () => {
+    setLoading(true);
+    setApiError(null);
+    // Re-fetch contacts
+    const loadContacts = async () => {
+      try {
+        const result = await fetchContacts();
+        if (result && result.data && Array.isArray(result.data.contacts)) {
+          setContacts(result.data.contacts);
+          setDataNotFound(result.data.contacts.length === 0);
+        } else {
+          setContacts([]);
+          setDataNotFound(true);
+        }
+      } catch (error) {
+        console.error("Error retrying contacts fetch:", error);
+        setApiError("Failed to load contacts. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadContacts();
+  };
 
   return (
     <div className="rounded-2xl p-6 text-[#595959] bg-[#F6F6F6]">
@@ -174,6 +233,43 @@ export default function ContactList() {
                   Loading contacts...
                 </td>
               </tr>
+            ) : apiError ? (
+              <tr>
+                <td colSpan="5" className="text-center py-6 text-gray-500">
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="text-red-500 font-medium text-lg mb-2">
+                      {apiError}
+                    </div>
+                    <button
+                      onClick={handleRetry}
+                      className="mt-2 border border-[#3283EC] text-[#3283EC] rounded-full px-4 py-2 flex items-center gap-2 hover:bg-[#EAF3FF] transition"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ) : dataNotFound ? (
+              <tr>
+                <td colSpan="5" className="text-center py-6 text-gray-500">
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="text-gray-500 font-medium text-lg mb-2">
+                      No Contacts Found
+                    </div>
+                    <div className="text-gray-500 text-sm mb-4">
+                      {contacts.length === 0
+                        ? "Start by adding your first contact."
+                        : "No contacts match your search criteria."}
+                    </div>
+                    <button
+                      onClick={handleAdd}
+                      className="border border-[#3283EC] text-[#3283EC] rounded-full px-4 py-2 flex items-center gap-2 hover:bg-[#EAF3FF] transition"
+                    >
+                      <PlusCircle size={16} /> Add Your First Contact
+                    </button>
+                  </div>
+                </td>
+              </tr>
             ) : currentContacts.length > 0 ? (
               currentContacts.map((item, index) => {
                 const globalIndex = indexOfFirstContact + index;
@@ -227,9 +323,7 @@ export default function ContactList() {
                   colSpan="5"
                   className="text-center py-6 text-gray-500 text-base"
                 >
-                  {contacts.length === 0
-                    ? "No contacts available."
-                    : "No contacts found matching your search."}
+                  No contacts available.
                 </td>
               </tr>
             )}
@@ -237,59 +331,62 @@ export default function ContactList() {
         </table>
 
         {/* Pagination Footer */}
-        {!loading && filteredContacts.length > 0 && (
-          <div className="flex justify-between items-center text-sm text-gray-500 px-4 py-3 bg-white border-t">
-            <span>
-              Showing {indexOfFirstContact + 1} to{" "}
-              {Math.min(indexOfLastContact, filteredContacts.length)} of{" "}
-              {filteredContacts.length} entries
-            </span>
-            <div className="flex gap-2 items-center">
-              <button
-                onClick={prevPage}
-                disabled={currentPage === 1}
-                className={`px-3 py-1 rounded ${
-                  currentPage === 1
-                    ? "text-gray-400 cursor-not-allowed"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                &lt; Previous
-              </button>
+        {!loading &&
+          !apiError &&
+          !dataNotFound &&
+          filteredContacts.length > 0 && (
+            <div className="flex justify-between items-center text-sm text-gray-500 px-4 py-3 bg-white border-t">
+              <span>
+                Showing {indexOfFirstContact + 1} to{" "}
+                {Math.min(indexOfLastContact, filteredContacts.length)} of{" "}
+                {filteredContacts.length} entries
+              </span>
+              <div className="flex gap-2 items-center">
+                <button
+                  onClick={prevPage}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === 1
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  &lt; Previous
+                </button>
 
-              {/* Page Numbers */}
-              <div className="flex gap-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (number) => (
-                    <button
-                      key={number}
-                      onClick={() => paginate(number)}
-                      className={`px-3 py-1 rounded ${
-                        currentPage === number
-                          ? "bg-[#3283EC] text-white"
-                          : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                    >
-                      {number}
-                    </button>
-                  )
-                )}
+                {/* Page Numbers */}
+                <div className="flex gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (number) => (
+                      <button
+                        key={number}
+                        onClick={() => paginate(number)}
+                        className={`px-3 py-1 rounded ${
+                          currentPage === number
+                            ? "bg-[#3283EC] text-white"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
+                        {number}
+                      </button>
+                    )
+                  )}
+                </div>
+
+                <button
+                  onClick={nextPage}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === totalPages
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  Next &gt;
+                </button>
               </div>
-
-              <button
-                onClick={nextPage}
-                disabled={currentPage === totalPages}
-                className={`px-3 py-1 rounded ${
-                  currentPage === totalPages
-                    ? "text-gray-400 cursor-not-allowed"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                Next &gt;
-              </button>
             </div>
-          </div>
-        )}
+          )}
       </div>
     </div>
   );
