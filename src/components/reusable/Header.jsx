@@ -1,35 +1,33 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
+import { fetchUser } from "@/services/api";
 
 export default function Header() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const loadUser = async () => {
       try {
-        const res = await fetch("/api/auth/me", {
-          credentials: "include",
-        });
+        setLoading(true);
+        setError(null);
+        const userData = await fetchUser();
 
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data.user || null);
+        if (userData) {
+          setUser(userData);
         } else {
-          // token invalid or not present
-          setUser(null);
+          setError("Failed to load user data");
         }
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
-        setUser(null);
+      } catch (err) {
+        setError(err.message || "An error occurred");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUser();
+    loadUser();
   }, []);
 
   return (

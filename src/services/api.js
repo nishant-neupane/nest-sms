@@ -30,10 +30,26 @@ export const fetchGroup = async () => {
       method: "GET",
       credentials: "include",
     });
-    return res; 
+    return res;
   } catch (err) {
     console.error("Contacts fetch error:", err);
     return { ok: false };
+  }
+};
+
+export const fetchUser = async () => {
+  try {
+    const res = await fetch("/api/auth/me", {
+      credentials: "include",
+    });
+
+    if (!res.ok) return null;
+
+    const { user } = await res.json();
+    return user || null;
+  } catch (error) {
+    console.error("Fetch User Error:", error);
+    return null;
   }
 };
 

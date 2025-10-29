@@ -7,7 +7,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
-
+  
 export default function SignupPage() {
   const router = useRouter();
 
