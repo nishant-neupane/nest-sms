@@ -8,10 +8,9 @@ export const getWalletBalance = async () => {
     return await res.json();
   } catch (err) {
     console.error("Wallet fetch error:", err);
-    return { balance: null }; 
+    return { balance: null };
   }
 };
-// /lib/api.js
 export const contacts = async () => {
   try {
     const res = await fetch(`/api/contacts`, {
@@ -25,15 +24,28 @@ export const contacts = async () => {
   }
 };
 
-
-
-
-export async function getTransactions(limit = 10, offset = 0) {
+export const fetchGroup = async () => {
   try {
-    const res = await fetch(`/api/wallet/transactions?limit=${limit}&offset=${offset}`, {
+    const res = await fetch(`/api/contacts/groups`, {
       method: "GET",
       credentials: "include",
     });
+    return res; 
+  } catch (err) {
+    console.error("Contacts fetch error:", err);
+    return { ok: false };
+  }
+};
+
+export async function getTransactions(limit = 10, offset = 0) {
+  try {
+    const res = await fetch(
+      `/api/wallet/transactions?limit=${limit}&offset=${offset}`,
+      {
+        method: "GET",
+        credentials: "include",
+      }
+    );
 
     // if (!res.ok) throw new Error("Failed to fetch transactions");
     return await res.json();
