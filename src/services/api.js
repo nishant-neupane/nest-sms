@@ -11,6 +11,20 @@ export const getWalletBalance = async () => {
     return { balance: null }; 
   }
 };
+// /lib/api.js
+export const contacts = async () => {
+  try {
+    const res = await fetch(`/api/contacts`, {
+      method: "GET",
+      credentials: "include",
+    });
+    return await res.json();
+  } catch (err) {
+    console.error("Contacts fetch error:", err);
+    return [];
+  }
+};
+
 
 
 
