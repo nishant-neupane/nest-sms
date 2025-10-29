@@ -44,15 +44,15 @@ export default function LoginPage() {
       setTimeout(() => router.push("/dashboard"), 1500);
     } catch (error) {
       console.error(error);
-      toast.error("Network error. Try again later.");
+      toast.error(error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-[#E9EFF7] p-6 ">
-      <div className=" grid grid-cols-1 md:grid-cols-5  gap-8  justify-center items-center overflow-hidden">
+    <div className="bg-[#E9EFF7] p-6 h-screen">
+      <div className=" grid grid-cols-1 md:grid-cols-5  gap-8  justify-center items-center overflow-hidden h-full">
         <div className="p-8 h-full bg-white rounded-xl md:col-span-3 flex flex-col justify-center ">
           <div className="w-full max-w-3xl mx-auto">
             <div className="flex justify-between items-center mb-6">
@@ -173,14 +173,19 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="bg-[#2375E0] rounded-xl md:col-span-2 ">
-          <Image
-            src={"/images/auth/right-bg.png"}
-            height={400}
-            width={490}
-            alt="Auth Background"
-            className="h-full w-full"
-          />
+        <div className="bg-[#2375E0] rounded-xl md:col-span-2 grid  h-full ">
+          <div className="flex justify-center items-center font-medium text-[30.6px] text-white">
+            Send your sms in bulk
+          </div>
+          <div className="flex justify-end items-end">
+            {" "}
+            <Image
+              src={"/images/auth/right-bg.png"}
+              height={400}
+              width={510}
+              alt="Auth Background"
+            />
+          </div>
         </div>
       </div>
     </div>
