@@ -20,10 +20,23 @@ const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
-        <p className="text-sm font-semibold mb-1">{payload[0].payload.name}</p>
-        <p className="text-sm text-blue-700">NTC: {payload[0].payload.ntc}</p>
-        <p className="text-sm text-blue-300">
-          NCell: {payload[0].payload.ncell}
+        {/* <p className="text-sm font-semibold mb-1">{payload[0].payload.name}</p> */}
+        <p
+          className="text-sm text-[#000000] flex justify-start items-center gap-2
+        "
+        >
+          <span className="inline-block w-3.5 h-3.5 bg-[#045CCF] rounded-full" />
+          {payload[0].payload.ntc}
+        </p>
+        <p className="text-sm text-[#000000] flex justify-start items-center gap-2">
+          <span className="inline-block w-3.5 h-3.5 bg-[#8CBEFF] rounded-full" />
+          {payload[0].payload.ncell}
+        </p>
+        <p className="font-medium text-sm text-[#8D8D8D] mt-2 leading-[100%]">
+          Total:{" "}
+          <span className="text-[#000000]">
+            {payload[0].payload.ntc + payload[0].payload.ncell}
+          </span>
         </p>
       </div>
     );
@@ -53,10 +66,7 @@ export const WeeklyAnalysisChart = () => (
       </div>
       <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={CHART_DATA}
-            barGap={-54}
-          >
+          <BarChart data={CHART_DATA} barGap={-54}>
             <XAxis
               dataKey="name"
               axisLine={false}
