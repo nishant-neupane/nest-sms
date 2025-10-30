@@ -3,7 +3,15 @@
 import { CheckCircle, Edit, PlusCircle, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { contacts as fetchContacts } from "@/services/api"; 
+import {
+  createContact,
+  deleteContact,
+  contacts as fetchContacts,
+  updateContact,
+  fetchGroup,
+  addContactsToGroup, // make sure this API exists
+} from "@/services/api";
+import { Modal } from "@/app/dashboard/components/modals/Modal";
 
 export default function ContactList() {
   const [contacts, setContacts] = useState([]);
@@ -11,115 +19,207 @@ export default function ContactList() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [contactsPerPage] = useState(7);
+  const [contactsPerPage] = useState(10);
   const [dataNotFound, setDataNotFound] = useState(false);
-  const [apiError, setApiError] = useState(null); // New state for API errors
+  const [apiError, setApiError] = useState(null);
 
-  useEffect(() => {
-    const loadContacts = async () => {
-      setLoading(true);
-      setDataNotFound(false);
-      setApiError(null); // Reset error state
-      try {
-        const result = await fetchContacts();
-        console.log("Fetched contacts data:", result);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [contactToDeleteId, setContactToDeleteId] = useState(null);
 
-        // More robust data checking
-        if (
-          result &&
-          result.data &&
-          Array.isArray(result.data.contacts) &&
-          result.data.contacts.length > 0
-        ) {
-          setContacts(result.data.contacts);
-          setDataNotFound(false);
-        } else if (
-          result &&
-          result.data &&
-          Array.isArray(result.data.contacts) &&
-          result.data.contacts.length === 0
-        ) {
-          // Empty array - valid response but no data
-          console.log("API returned empty contacts array");
-          setContacts([]);
-          setDataNotFound(true);
-        } else {
-          // Invalid response format or authentication issue
-          console.warn("Unexpected API response format:", result);
-          setContacts([]);
-          setDataNotFound(true);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [contactToEdit, setContactToEdit] = useState({
+    id: null,
+    name: "",
+    phone: "",
+    groupIds: [],
+  });
 
-          // Check if it's an authentication issue (empty object often indicates auth failure)
-          if (result && Object.keys(result).length === 0) {
-            setApiError("Authentication required. Please log in again.");
-          } else {
-            setApiError("Failed to load contacts. Please try again.");
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching contacts:", error);
+  const [groups, setGroups] = useState([]);
+
+  const loadContacts = async () => {
+    setLoading(true);
+    setDataNotFound(false);
+    setApiError(null);
+    try {
+      const result = await fetchContacts();
+      if (result?.data?.contacts?.length > 0) {
+        setContacts(result.data.contacts);
+        setDataNotFound(false);
+      } else {
         setContacts([]);
         setDataNotFound(true);
-        setApiError("Network error. Please check your connection.");
+      }
+    } catch (error) {
+      console.error("Error fetching contacts:", error);
+      setContacts([]);
+      setDataNotFound(true);
+      setApiError("Failed to load contacts. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchGroupsData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetchGroup();
+        // if (!response.ok)
+        // throw new Error(`Failed to fetch groups: ${response.status}`);
+        const data = await response.json();
+        setGroups(data.groups || []);
+      } catch (err) {
+        console.error("Error fetching groups:", err);
       } finally {
         setLoading(false);
       }
     };
+    fetchGroupsData();
+  }, []);
 
+  useEffect(() => {
     loadContacts();
   }, []);
 
-  // Delete contact
-  const handleDelete = (id) => {
-    setContacts((prev) => prev.filter((item) => item.id !== id));
-    // Reset to first page if current page becomes empty
-    if (currentPage > 1 && filteredContacts.length === 1) {
-      setCurrentPage(currentPage - 1);
+  const confirmDelete = (id) => {
+    setContactToDeleteId(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteConfirmed = async () => {
+    const id = contactToDeleteId;
+    setShowDeleteModal(false);
+    setContactToDeleteId(null);
+    if (!id) return;
+
+    try {
+      setLoading(true);
+      const response = await deleteContact(id);
+      if (response?.success || response?.data || response?.message) {
+        setContacts((prev) => {
+          const updated = prev.filter((item) => item.id !== id);
+          if (
+            currentPage > 1 &&
+            updated.length <= (currentPage - 1) * contactsPerPage
+          ) {
+            setCurrentPage(currentPage - 1);
+          }
+          return updated;
+        });
+        setApiError(null);
+      } else {
+        setApiError("Failed to delete contact");
+      }
+    } catch (err) {
+      console.error("Error deleting contact:", err);
+      setApiError("Failed to delete contact. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Edit contact
-  const handleEdit = (id) => {
-    const name = prompt("Enter new name:");
-    const contact = prompt("Enter new contact number:");
-    if (name && contact) {
-      setContacts((prev) =>
-        prev.map((item) => (item.id === id ? { ...item, name, contact } : item))
-      );
+  const handleEdit = (contact) => {
+    setContactToEdit({
+      id: contact.id,
+      name: contact.name,
+      phone: contact.phone,
+      groupIds: contact.groupIds || [],
+    });
+    setShowEditModal(true);
+  };
+
+  const handleUpdate = async () => {
+    try {
+      setLoading(true);
+      const { id, name, phone, groupIds } = contactToEdit;
+
+      // First, update the basic contact info
+      const response = await updateContact(id, { name, phone });
+
+      if (response?.success || response?.data || response?.message) {
+        // Handle group assignments
+        if (groups.length > 0) {
+          try {
+            // Get the current contact to check existing group assignments
+            const currentContact = contacts.find((c) => c.id === id);
+            const currentGroupIds = currentContact?.groupIds || [];
+
+            // Find groups to add and remove
+            const groupsToAdd = groupIds.filter(
+              (groupId) => !currentGroupIds.includes(groupId)
+            );
+            const groupsToRemove = currentGroupIds.filter(
+              (groupId) => !groupIds.includes(groupId)
+            );
+
+            // Add to new groups
+            if (groupsToAdd.length > 0) {
+              const addPromises = groupsToAdd.map((groupId) =>
+                addContactsToGroup(groupId, [id])
+              );
+              await Promise.all(addPromises);
+            }
+
+            // Remove from old groups (you'll need to implement removeContactsFromGroup API)
+            if (groupsToRemove.length > 0) {
+              const removePromises = groupsToRemove.map((groupId) =>
+                removeContactsFromGroup(groupId, [id])
+              );
+              await Promise.all(removePromises);
+            }
+          } catch (groupError) {
+            console.error("Error managing group assignments:", groupError);
+            // Show a warning but don't fail the entire update
+            alert(
+              "Contact updated but there was an issue with group assignments. Please check the groups."
+            );
+          }
+        }
+
+        setShowEditModal(false);
+        await loadContacts(); // Reload to get updated group information
+        setContactToEdit({ id: null, name: "", phone: "", groupIds: [] });
+        setApiError(null);
+      } else {
+        setApiError("Failed to update contact");
+      }
+    } catch (err) {
+      console.error("Error updating contact:", err);
+      setApiError("Failed to update contact. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Add contact
-  const handleAdd = () => {
+  const handleAdd = async () => {
     const name = prompt("Enter contact name:");
-    const contact = prompt("Enter contact number:");
-    if (name && contact) {
-      const newId =
-        contacts.length > 0 ? Math.max(...contacts.map((c) => c.id)) + 1 : 1;
-      const newContact = {
-        id: newId,
-        sn: newId.toString().padStart(2, "0"),
-        name,
-        contact,
-        date: new Date().toLocaleDateString("en-GB"),
-      };
-      setContacts([...contacts, newContact]);
-      setDataNotFound(false);
-      setApiError(null); // Clear any previous errors when adding contact
-      // Go to last page where the new contact will be shown
-      const totalFilteredPages = Math.ceil(
-        (filteredContacts.length + 1) / contactsPerPage
-      );
-      setCurrentPage(totalFilteredPages);
+    const phone = prompt("Enter contact number:");
+    if (name && phone) {
+      try {
+        setLoading(true);
+        const newContact = { name, phone, groupIds: [] };
+        const response = await createContact(newContact);
+        if (response?.success || response?.data || response?.message) {
+          setContacts((prev) => [...prev, response.data || newContact]);
+          setDataNotFound(false);
+          setApiError(null);
+        } else {
+          setApiError("Failed to add contact");
+        }
+      } catch (err) {
+        console.error("Error creating contact:", err);
+        setApiError("Failed to add contact. Try again.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
-  // Filtered contacts based on search
+  // Filtering & Pagination
   const filteredContacts = contacts.filter((c) =>
     c.name?.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Pagination logic
   const indexOfLastContact = currentPage * contactsPerPage;
   const indexOfFirstContact = indexOfLastContact - contactsPerPage;
   const currentContacts = filteredContacts.slice(
@@ -128,52 +228,14 @@ export default function ContactList() {
   );
   const totalPages = Math.ceil(filteredContacts.length / contactsPerPage);
 
-  // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const nextPage = () =>
+    currentPage < totalPages && setCurrentPage(currentPage + 1);
+  const prevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
 
-  // Go to next page
-  const nextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
+  useEffect(() => setCurrentPage(1), [search]);
 
-  // Go to previous page
-  const prevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  // Reset to first page when search changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search]);
-
-  // Retry loading contacts
-  const handleRetry = () => {
-    setLoading(true);
-    setApiError(null);
-    // Re-fetch contacts
-    const loadContacts = async () => {
-      try {
-        const result = await fetchContacts();
-        if (result && result.data && Array.isArray(result.data.contacts)) {
-          setContacts(result.data.contacts);
-          setDataNotFound(result.data.contacts.length === 0);
-        } else {
-          setContacts([]);
-          setDataNotFound(true);
-        }
-      } catch (error) {
-        console.error("Error retrying contacts fetch:", error);
-        setApiError("Failed to load contacts. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadContacts();
-  };
+  const handleRetry = () => loadContacts();
 
   return (
     <div className="rounded-2xl p-6 text-[#595959] bg-[#F6F6F6]">
@@ -204,14 +266,14 @@ export default function ContactList() {
 
           <button
             className="border border-[#F10000] text-[#F10000] rounded-full px-4 py-2 flex items-center gap-2 hover:bg-[#FDECEC] transition"
-            onClick={() => selected && handleDelete(selected)}
+            onClick={() => selected && confirmDelete(selected)}
           >
             <Trash2 size={18} /> Delete
           </button>
         </div>
       </div>
 
-      {/* Table */}
+      {/* Contacts Table */}
       <div className="overflow-hidden rounded-2xl">
         <table className="w-full">
           <thead>
@@ -223,7 +285,6 @@ export default function ContactList() {
               <th className="py-3 px-4 rounded-r-full">Action</th>
             </tr>
           </thead>
-
           <tbody className="text-[16px] rounded-3xl">
             {loading ? (
               <tr>
@@ -297,18 +358,14 @@ export default function ContactList() {
                       {item.date || new Date().toLocaleDateString("en-GB")}
                     </td>
                     <td className="py-3 px-4 flex items-center gap-3">
-                      <CheckCircle
-                        size={18}
-                        className="text-green-600 cursor-pointer hover:scale-110 transition"
-                      />
                       <Edit
                         size={18}
-                        onClick={() => handleEdit(item.id)}
+                        onClick={() => handleEdit(item)}
                         className="text-[#E5C100] cursor-pointer hover:scale-110 transition"
                       />
                       <Trash2
                         size={18}
-                        onClick={() => handleDelete(item.id)}
+                        onClick={() => confirmDelete(item.id)}
                         className="text-[#F10000] cursor-pointer hover:scale-110 transition"
                       />
                     </td>
@@ -328,7 +385,7 @@ export default function ContactList() {
           </tbody>
         </table>
 
-        {/* Pagination Footer */}
+        {/* Pagination */}
         {!loading &&
           !apiError &&
           !dataNotFound &&
@@ -352,7 +409,6 @@ export default function ContactList() {
                   &lt; Previous
                 </button>
 
-                {/* Page Numbers */}
                 <div className="flex gap-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                     (number) => (
@@ -386,6 +442,108 @@ export default function ContactList() {
             </div>
           )}
       </div>
+
+      {/* Delete Modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="Delete"
+      >
+        <div className="flex flex-col items-center">
+          <div className="p-4 mb-4 rounded-full bg-red-100">
+            <Trash2 size={24} className="text-[#F10000]" />
+          </div>
+          <p className="text-gray-500 text-center mb-6">
+            Are you sure you want to delete?
+            <br />
+            <strong>This action cannot be undone.</strong>
+          </p>
+          <div className="flex gap-4 w-full">
+            <button
+              onClick={() => setShowDeleteModal(false)}
+              className="flex-1 border border-gray-300 text-gray-700 rounded-full px-4 py-3 hover:bg-gray-50 transition"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={confirmDeleteConfirmed}
+              className="flex-1 bg-[#F10000] text-white rounded-full px-4 py-3 hover:bg-red-700 transition font-medium"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Edit Modal */}
+      <Modal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title="Edit Contact"
+      >
+        <div className="flex flex-col gap-4">
+          <input
+            type="text"
+            placeholder="Name"
+            value={contactToEdit.name}
+            onChange={(e) =>
+              setContactToEdit({ ...contactToEdit, name: e.target.value })
+            }
+            className="border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#3283EC]"
+          />
+          <input
+            type="text"
+            placeholder="Phone"
+            value={contactToEdit.phone}
+            onChange={(e) =>
+              setContactToEdit({ ...contactToEdit, phone: e.target.value })
+            }
+            className="border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#3283EC]"
+          />
+
+          {/* Groups Multi-Select */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-700">
+              Assign Groups
+            </label>
+            <select
+              multiple
+              value={contactToEdit.groupIds}
+              onChange={(e) =>
+                setContactToEdit({
+                  ...contactToEdit,
+                  groupIds: Array.from(
+                    e.target.selectedOptions,
+                    (option) => option.value
+                  ),
+                })
+              }
+              className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3283EC]"
+            >
+              {groups.map((group) => (
+                <option key={group.id} value={group.id}>
+                  {group.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex gap-4">
+            <button
+              onClick={() => setShowEditModal(false)}
+              className="flex-1 border border-gray-300 text-gray-700 rounded-full px-4 py-2 hover:bg-gray-50 transition"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleUpdate}
+              className="flex-1 bg-[#3283EC] text-white rounded-full px-4 py-2 hover:bg-blue-700 transition font-medium"
+            >
+              Update Contact
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

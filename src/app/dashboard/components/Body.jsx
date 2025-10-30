@@ -7,7 +7,7 @@ import { StatCard } from "./StatCard";
 import { TierProgress } from "./TierProgress";
 import { UsersOverview } from "./UsersOverview";
 import { WeeklyAnalysisChart } from "./WeeklyAnalysisChart";
-import { contacts, fetchGroup, getWalletBalance } from "@/services/api";
+import { contacts, fetchGroup, getWalletBalance } from "../../../services/api";
 
 const Body = () => {
   const [wallet, setWallet] = useState(null);
