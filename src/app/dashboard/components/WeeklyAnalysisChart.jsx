@@ -16,6 +16,20 @@ const CHART_DATA = [
   { name: "F", ntc: 50, ncell: 70 },
   { name: "S", ntc: 30, ncell: 40 },
 ];
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
+        <p className="text-sm font-semibold mb-1">{payload[0].payload.name}</p>
+        <p className="text-sm text-blue-700">NTC: {payload[0].payload.ntc}</p>
+        <p className="text-sm text-blue-300">
+          NCell: {payload[0].payload.ncell}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
 
 export const WeeklyAnalysisChart = () => (
   <div className="col-span-2">
@@ -37,23 +51,37 @@ export const WeeklyAnalysisChart = () => (
           </div>
         </div>
       </div>
-      <div className="h-44 w-full">
+      <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={CHART_DATA}>
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Bar
-              dataKey="ntc"
-              stackId="a"
-              fill="#045CCF"
-              radius={[ 0, 0, 0, 0]}
+          <BarChart
+            data={CHART_DATA}
+            barGap={-54}
+          >
+            <XAxis
+              dataKey="name"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "#6B7280", fontSize: 14 }}
             />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "#6B7280", fontSize: 14 }}
+              ticks={[0, 50, 100]}
+            />
+            <Tooltip content={<CustomTooltip />} cursor={false} />
+
             <Bar
               dataKey="ncell"
-              stackId="a"
               fill="#8CBEFF"
-              radius={[0, 0, 0, 0]}
+              radius={[50, 50, 50, 50]}
+              maxBarSize={60}
+            />
+            <Bar
+              dataKey="ntc"
+              fill="#045CCF"
+              radius={[50, 50, 50, 50]}
+              maxBarSize={60}
             />
           </BarChart>
         </ResponsiveContainer>
