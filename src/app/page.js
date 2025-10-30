@@ -1,11 +1,11 @@
-import React from "react";
+import StepFirst from "@/components/kyc/StepFirst";
 
 const page = () => {
-  return
-  <div>
-    ijfdoi
-  </div>
+  return (
+    <div>
+      <StepFirst />
+    </div>
+  );
 };
 
 export default page;
-  
