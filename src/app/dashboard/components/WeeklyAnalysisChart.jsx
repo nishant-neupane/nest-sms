@@ -10,7 +10,7 @@ import {
 const CHART_DATA = [
   { name: "S", ntc: 40, ncell: 60 },
   { name: "M", ntc: 70, ncell: 90 },
-  { name: "T", ntc: 80, ncell: 100 },
+  { name: "T", ntc:   180, ncell: 100 },
   { name: "W", ntc: 90, ncell: 120 },
   { name: "T", ntc: 60, ncell: 80 },
   { name: "F", ntc: 50, ncell: 70 },
@@ -66,7 +66,7 @@ export const WeeklyAnalysisChart = () => (
       </div>
       <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={CHART_DATA} barGap={-54}>
+          <BarChart data={CHART_DATA}>
             <XAxis
               dataKey="name"
               axisLine={false}

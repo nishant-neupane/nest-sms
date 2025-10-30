@@ -7,7 +7,7 @@ import Header from "@/components/reusable/Header";
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
 
-  const noLayoutRoutes = ["/login", "/signup"];
+  const noLayoutRoutes = ["/login", "/signup", "/forgot-password", "/"];
   const isAuthPage = noLayoutRoutes.includes(pathname);
 
   if (isAuthPage) {
