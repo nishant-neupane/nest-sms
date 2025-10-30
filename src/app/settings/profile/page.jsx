@@ -22,7 +22,7 @@ export default function ProfilePage() {
 
       <div className="grid grid-cols-2 gap-6 text-sm">
         <div>
-          <h4 className="font-medium text-gray-700 mb-2">Personal Details</h4>
+          <h4 className="font-medium text-[#1F1F1f] mb-2">Personal Details</h4>
           <div className="grid grid-cols-2 gap-4">
             <input
               className="border border-gray-300 rounded-md p-2 w-full"

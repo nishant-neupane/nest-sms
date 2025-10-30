@@ -14,7 +14,7 @@ export default function ProfileWrapper({ children }) {
 
   return (
     <div className="flex gap-4">
-      <aside className="w-64 bg-[#F6F6F6] border-r border-[#F6F6F6] p-6">
+      <aside className="w-64 bg-[#F6F6F6] border-r border-[#F6F6F6] rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-6">Settings</h2>
         <nav className="space-y-2">
           {menuItems.map((item) => (
