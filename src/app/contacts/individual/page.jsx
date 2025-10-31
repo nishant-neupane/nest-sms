@@ -9,9 +9,9 @@ import {
   contacts as fetchContacts,
   updateContact,
   fetchGroup,
-  addContactsToGroup, // make sure this API exists
+  addContactsToGroup,
 } from "@/services/api";
-import { Modal } from "@/app/dashboard/components/modals/Modal";
+import { Modal } from "@/components/reusable/Modal";
 
 export default function ContactList() {
   const [contacts, setContacts] = useState([]);
@@ -19,7 +19,7 @@ export default function ContactList() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [contactsPerPage] = useState(10);
+  const [contactsPerPage] = useState(15);
   const [dataNotFound, setDataNotFound] = useState(false);
   const [apiError, setApiError] = useState(null);
 
@@ -62,16 +62,11 @@ export default function ContactList() {
   useEffect(() => {
     const fetchGroupsData = async () => {
       try {
-        setLoading(true);
         const response = await fetchGroup();
-        // if (!response.ok)
-        // throw new Error(`Failed to fetch groups: ${response.status}`);
         const data = await response.json();
         setGroups(data.groups || []);
       } catch (err) {
         console.error("Error fetching groups:", err);
-      } finally {
-        setLoading(false);
       }
     };
     fetchGroupsData();
@@ -133,43 +128,26 @@ export default function ContactList() {
       setLoading(true);
       const { id, name, phone, groupIds } = contactToEdit;
 
-      // First, update the basic contact info
       const response = await updateContact(id, { name, phone });
 
       if (response?.success || response?.data || response?.message) {
-        // Handle group assignments
         if (groups.length > 0) {
           try {
-            // Get the current contact to check existing group assignments
             const currentContact = contacts.find((c) => c.id === id);
             const currentGroupIds = currentContact?.groupIds || [];
 
-            // Find groups to add and remove
             const groupsToAdd = groupIds.filter(
               (groupId) => !currentGroupIds.includes(groupId)
             );
-            const groupsToRemove = currentGroupIds.filter(
-              (groupId) => !groupIds.includes(groupId)
-            );
 
-            // Add to new groups
             if (groupsToAdd.length > 0) {
               const addPromises = groupsToAdd.map((groupId) =>
                 addContactsToGroup(groupId, [id])
               );
               await Promise.all(addPromises);
             }
-
-            // Remove from old groups (you'll need to implement removeContactsFromGroup API)
-            if (groupsToRemove.length > 0) {
-              const removePromises = groupsToRemove.map((groupId) =>
-                removeContactsFromGroup(groupId, [id])
-              );
-              await Promise.all(removePromises);
-            }
           } catch (groupError) {
             console.error("Error managing group assignments:", groupError);
-            // Show a warning but don't fail the entire update
             alert(
               "Contact updated but there was an issue with group assignments. Please check the groups."
             );
@@ -177,7 +155,7 @@ export default function ContactList() {
         }
 
         setShowEditModal(false);
-        await loadContacts(); // Reload to get updated group information
+        await loadContacts();
         setContactToEdit({ id: null, name: "", phone: "", groupIds: [] });
         setApiError(null);
       } else {
@@ -238,9 +216,9 @@ export default function ContactList() {
   const handleRetry = () => loadContacts();
 
   return (
-    <div className="rounded-2xl p-6 text-[#595959] bg-[#F6F6F6]">
+    <div className="rounded-2xl p-6 text-[#595959] bg-[#F6F6F6] h-full flex flex-col">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-6">
         <h2 className="font-bold text-[20px]">Individual Contacts</h2>
         <div className="flex items-center gap-3">
           <div className="relative">
@@ -273,117 +251,119 @@ export default function ContactList() {
         </div>
       </div>
 
-      {/* Contacts Table */}
-      <div className="overflow-hidden rounded-2xl">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-gradient-to-b from-[#4A98FF] to-[#2779E3] text-white text-left text-base rounded-tr-full">
-              <th className="py-3 px-4 rounded-l-full">S.N</th>
-              <th className="py-3 px-4">Contact Name</th>
-              <th className="py-3 px-4">Contact No.</th>
-              <th className="py-3 px-4">Created In</th>
-              <th className="py-3 px-4 rounded-r-full">Action</th>
-            </tr>
-          </thead>
-          <tbody className="text-[16px] rounded-3xl">
-            {loading ? (
-              <tr>
-                <td colSpan="5" className="text-center py-6 text-gray-500">
-                  Loading contacts...
-                </td>
+      {/* Contacts Table Container */}
+      <div className="bg-white rounded-2xl flex-1 flex flex-col overflow-hidden">
+        <div
+          className="flex-1 overflow-auto"
+          style={{ scrollbarWidth: "none" }}
+        >
+          <table className="w-full">
+            <thead className="sticky top-0 z-10">
+              <tr className="bg-gradient-to-b from-[#4A98FF] to-[#2779E3] text-white text-left text-base">
+                <th className="py-3 px-4 rounded-l-full">S.N</th>
+                <th className="py-3 px-4">Contact Name</th>
+                <th className="py-3 px-4">Contact No.</th>
+                <th className="py-3 px-4">Created In</th>
+                <th className="py-3 px-4 rounded-r-full">Action</th>
               </tr>
-            ) : apiError ? (
-              <tr>
-                <td colSpan="5" className="text-center py-6 text-gray-500">
-                  <div className="flex flex-col items-center justify-center">
-                    <div className="text-red-500 font-medium text-lg mb-2">
-                      {apiError}
+            </thead>
+            <tbody className="text-[16px]">
+              {loading ? (
+                <tr>
+                  <td colSpan="5" className="text-center py-8 text-gray-500">
+                    Loading contacts...
+                  </td>
+                </tr>
+              ) : apiError ? (
+                <tr>
+                  <td colSpan="5" className="text-center py-8">
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="text-red-500 font-medium text-lg mb-2">
+                        {apiError}
+                      </div>
+                      <button
+                        onClick={handleRetry}
+                        className="mt-2 border border-[#3283EC] text-[#3283EC] rounded-full px-4 py-2 hover:bg-[#EAF3FF] transition"
+                      >
+                        Retry
+                      </button>
                     </div>
-                    <button
-                      onClick={handleRetry}
-                      className="mt-2 border border-[#3283EC] text-[#3283EC] rounded-full px-4 py-2 flex items-center gap-2 hover:bg-[#EAF3FF] transition"
+                  </td>
+                </tr>
+              ) : dataNotFound ? (
+                <tr>
+                  <td colSpan="5" className="text-center py-8">
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="text-gray-500 font-medium text-lg mb-2">
+                        No Contacts Found
+                      </div>
+                      <div className="text-gray-500 text-sm mb-4">
+                        {contacts.length === 0
+                          ? "Start by adding your first contact."
+                          : "No contacts match your search criteria."}
+                      </div>
+                      <button
+                        onClick={handleAdd}
+                        className="border border-[#3283EC] text-[#3283EC] rounded-full px-4 py-2 flex items-center gap-2 hover:bg-[#EAF3FF] transition"
+                      >
+                        <PlusCircle size={16} /> Add Your First Contact
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ) : currentContacts.length > 0 ? (
+                currentContacts.map((item, index) => {
+                  const globalIndex = indexOfFirstContact + index;
+                  return (
+                    <tr
+                      key={item.id || globalIndex}
+                      className={`border-b border-gray-200 hover:bg-[#EAF3FF] transition ${
+                        selected === item.id ? "bg-[#EAF3FF]" : ""
+                      }`}
                     >
-                      Retry
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ) : dataNotFound ? (
-              <tr>
-                <td colSpan="5" className="text-center py-6 text-gray-500">
-                  <div className="flex flex-col items-center justify-center">
-                    <div className="text-gray-500 font-medium text-lg mb-2">
-                      No Contacts Found
-                    </div>
-                    <div className="text-gray-500 text-sm mb-4">
-                      {contacts.length === 0
-                        ? "Start by adding your first contact."
-                        : "No contacts match your search criteria."}
-                    </div>
-                    <button
-                      onClick={handleAdd}
-                      className="border border-[#3283EC] text-[#3283EC] rounded-full px-4 py-2 flex items-center gap-2 hover:bg-[#EAF3FF] transition"
-                    >
-                      <PlusCircle size={16} /> Add Your First Contact
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ) : currentContacts.length > 0 ? (
-              currentContacts.map((item, index) => {
-                const globalIndex = indexOfFirstContact + index;
-                return (
-                  <tr
-                    key={item.id || globalIndex}
-                    className={`border-b border-gray-200 hover:bg-[#EAF3FF] transition rounded-2xl ${
-                      selected === item.id ? "bg-[#EAF3FF]" : ""
-                    }`}
-                  >
-                    <td className="py-3 px-4">
-                      <input
-                        type="radio"
-                        name="select"
-                        checked={selected === item.id}
-                        onChange={() => setSelected(item.id)}
-                        className="accent-[#3283EC]"
-                      />{" "}
-                      <span className="ml-2">
-                        {item.sn ||
-                          (globalIndex + 1).toString().padStart(2, "0")}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">{item.name}</td>
-                    <td className="py-3 px-4">{item.phone}</td>
-                    <td className="py-3 px-4">
-                      {item.date || new Date().toLocaleDateString("en-GB")}
-                    </td>
-                    <td className="py-3 px-4 flex items-center gap-3">
-                      <Edit
-                        size={18}
-                        onClick={() => handleEdit(item)}
-                        className="text-[#E5C100] cursor-pointer hover:scale-110 transition"
-                      />
-                      <Trash2
-                        size={18}
-                        onClick={() => confirmDelete(item.id)}
-                        className="text-[#F10000] cursor-pointer hover:scale-110 transition"
-                      />
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td
-                  colSpan="5"
-                  className="text-center py-6 text-gray-500 text-base"
-                >
-                  No contacts available.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                      <td className="py-3 px-4">
+                        <input
+                          type="radio"
+                          name="select"
+                          checked={selected === item.id}
+                          onChange={() => setSelected(item.id)}
+                          className="accent-[#3283EC]"
+                        />{" "}
+                        <span className="ml-2">
+                          {item.sn ||
+                            (globalIndex + 1).toString().padStart(2, "0")}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">{item.name}</td>
+                      <td className="py-3 px-4">{item.phone}</td>
+                      <td className="py-3 px-4">
+                        {item.date || new Date().toLocaleDateString("en-GB")}
+                      </td>
+                      <td className="py-3 px-4 flex items-center gap-3">
+                        <Edit
+                          size={18}
+                          onClick={() => handleEdit(item)}
+                          className="text-[#E5C100] cursor-pointer hover:scale-110 transition"
+                        />
+                        <Trash2
+                          size={18}
+                          onClick={() => confirmDelete(item.id)}
+                          className="text-[#F10000] cursor-pointer hover:scale-110 transition"
+                        />
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="5" className="text-center py-8 text-gray-500">
+                    No contacts available.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
         {/* Pagination */}
         {!loading &&
@@ -501,7 +481,6 @@ export default function ContactList() {
             className="border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#3283EC]"
           />
 
-          {/* Groups Multi-Select */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-gray-700">
               Assign Groups

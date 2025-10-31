@@ -16,7 +16,7 @@ import {
   updateGroup,
   deleteGroup,
 } from "@/services/api";
-import { Modal } from "@/app/dashboard/components/modals/Modal";
+import { Modal } from "@/components/reusable/Modal";
 
 export default function ContactList() {
   const [groups, setGroups] = useState([]);

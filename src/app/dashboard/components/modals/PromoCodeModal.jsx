@@ -1,6 +1,6 @@
 // components/modals/PromoCodeModal.jsx
 import { useState } from "react";
-import { Modal } from "./Modal";
+import { Modal } from "../../../../components/reusable/Modal";
 
 export const PromoCodeModal = ({ isOpen, onClose, onApplyPromo }) => {
   const [promoCode, setPromoCode] = useState("");

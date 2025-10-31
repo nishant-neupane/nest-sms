@@ -1,6 +1,6 @@
 // components/modals/SendSMSModal.jsx
 import { useState, useEffect } from "react";
-import { Modal } from "./Modal";
+import { Modal } from "../../../../components/reusable/Modal";
 
 export const SendSMSModal = ({ isOpen, onClose, onSendSMS }) => {
   const [formData, setFormData] = useState({
